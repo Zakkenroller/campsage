@@ -1,0 +1,18 @@
+# CampSage is a STATIC site. GitHub Actions runs the scan (.github/workflows/scan.yml),
+# builds ./public, and deploys it here — Netlify itself does not build anything.
+# This file only matters if you connect the repo to Netlify for git-triggered deploys;
+# the Actions deploy uses the ./public/_redirects file that build_site.py writes.
+
+[build]
+  publish = "public"
+  command = ""
+
+[[redirects]]
+  from = "/camp"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/camp/map"
+  to = "/map.html"
+  status = 200

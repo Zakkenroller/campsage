@@ -2,7 +2,12 @@
 
 Finds great **California** campsites with **2–3 consecutive nights open at the same site**,
 ranked **closest-to-home first** among **well-reviewed** spots, and publishes a phone-friendly
-status page + an interactive map. Runs on any always-on box via cron. **No API keys.**
+status page + an interactive map. **No API keys.**
+
+Currently tuned for a **Napa, CA** home base (Northern California regions: Sonoma/Mendocino coast,
+Tahoe, Gold Country, Yosemite, the redwoods…). Change `HOME_*` + `REGION_ANCHORS` + `BEACH_ALLOW`
+in `config.py` to re-home it anywhere. It runs on a schedule via **GitHub Actions** and publishes a
+**static site to Netlify** — no server to keep alive (see **Deploy** below).
 
 ## Quick start
 ```bash
@@ -70,13 +75,43 @@ links open on the phone where the user is logged in and get real results every t
   to the current top spots → `~/campsage/booking_tips.json` (shown under "Booking concierge").
 
 ## Tuning
-Everything is in `config.py`: home base, max distance, rating bars, window length, nights
-(`NIGHTS=[3,2]`), `WEEKENDS_ONLY`. Edit and re-run `python3 camp_agent.py`.
+Everything is in `config.py`: home base (`HOME_NAME`/`HOME_LAT`/`HOME_LNG`), max distance, rating
+bars, window length, nights (`NIGHTS=[3,2]`), `WEEKENDS_ONLY`, the region tabs (`REGION_ANCHORS`),
+and the beach list (`BEACH_ALLOW`). Edit and re-run `python3 camp_agent.py`.
 
-## Cron (Pacific, in `crontab -l`)
-- `camp_agent.py` at **7:00 / 13:00 / 18:00** (7am catches recreation.gov's rolling 6-month
-  release; midday + evening catch cancellations).
-- `ai_concierge.sh` at **7:10** (subscription tips refresh).
+## Deploy (GitHub Actions → Netlify) — no server needed
+The scan output is a **static snapshot**, so there's nothing to keep running. GitHub Actions runs the
+scan on a schedule and deploys a static site to Netlify:
+
+1. `.github/workflows/scan.yml` runs `camp_agent.py` → `camp_wiki_images.py` → `build_site.py` on a
+   cron (~7am / 1pm / 6pm Pacific) and on manual trigger.
+2. `build_site.py` assembles `./public/` — `index.html` (the dashboard), `map.html` (the interactive
+   map, data baked in), `status.json`, and `_redirects` (so `/camp` and `/camp/map` still resolve).
+3. The workflow deploys `./public` to Netlify.
+
+**One-time setup** (≈5 min):
+1. Create a Netlify site (empty is fine): **app.netlify.com → Add new site → Import an existing
+   project**, or `netlify sites:create`. Note its **Site ID** (Site settings → General → Site ID).
+2. Create a Netlify **personal access token**: **User settings → Applications → New access token**.
+3. In this GitHub repo → **Settings → Secrets and variables → Actions → New repository secret**, add:
+   - `NETLIFY_AUTH_TOKEN` = the token from step 2
+   - `NETLIFY_SITE_ID` = the Site ID from step 1
+4. Go to the repo's **Actions** tab → **Scan & publish CampSage** → **Run workflow** to publish now.
+   After that it runs itself on the schedule.
+
+> **Note:** recreation.gov / ReserveCalifornia occasionally block datacenter IPs. If a scheduled run
+> gets no data, the run logs will show it — the fix is to run the same workflow on a self-hosted
+> runner (e.g. a home machine or Raspberry Pi) instead of GitHub's shared runners.
+
+## Run it locally
+```bash
+pip install -r requirements.txt
+python3 camp_agent.py         # scan → writes ~/campsage/status.json + dashboard.html
+python3 camp_wiki_images.py   # (optional) park/beach photos
+python3 campsage_web.py       # serve → http://localhost:5001/camp  (and /camp/map)
+# or build the static site the way Netlify gets it:
+python3 build_site.py         # → ./public/{index.html, map.html, ...}
+```
 
 ## Validate
 `python3 selftest.py` — checks the live API, freshness, sort/distance/rating/nights invariants,

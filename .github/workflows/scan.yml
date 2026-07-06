@@ -1,0 +1,49 @@
+name: Scan & publish CampSage
+
+# Runs the campsite scan on a schedule and deploys the fresh static site to Netlify.
+# No always-on server needed — the scan output is a static snapshot.
+
+on:
+  workflow_dispatch:        # lets you run it by hand from the Actions tab
+  schedule:
+    # Times are UTC. These ≈ 7am / 1pm / 6pm Pacific (PDT):
+    - cron: "0 14 * * *"    # ~7am  — catches recreation.gov's morning rolling release
+    - cron: "0 20 * * *"    # ~1pm  — catches cancellations
+    - cron: "0 1  * * *"    # ~6pm  — evening pass
+
+# Never let two scans overlap.
+concurrency:
+  group: campsage-scan
+  cancel-in-progress: false
+
+jobs:
+  scan-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Scan campgrounds (recreation.gov + ReserveCalifornia)
+        run: python3 camp_agent.py
+
+      - name: Fetch park/beach photos (optional, non-fatal)
+        run: python3 camp_wiki_images.py || echo "photo fetch skipped/failed — continuing"
+
+      - name: Build static site into ./public
+        run: python3 build_site.py
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v3.0
+        with:
+          publish-dir: ./public
+          production-deploy: true
+          deploy-message: "CampSage scan ${{ github.run_number }}"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}

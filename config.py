@@ -10,13 +10,14 @@ Everything tunable lives here. Edit + re-run camp_agent.py (or wait for cron).
 from pathlib import Path
 
 # ── Where "closest" is measured from (home base for drive distance) ───────────
-HOME_NAME = "Los Angeles"
-HOME_LAT  = 34.0522
-HOME_LNG  = -118.2437
+HOME_NAME = "Napa"
+HOME_LAT  = 38.2975
+HOME_LNG  = -122.2869
 
 # ── How far you'll drive + how good a spot has to be ──────────────────────────
-SEARCH_RADIUS_MI = 150      # recreation.gov search radius (miles)
-MAX_DISTANCE_MI  = 150      # hard cap: drop anything farther than this
+SEARCH_RADIUS_MI = 175      # recreation.gov search radius (miles)
+MAX_DISTANCE_MI  = 175      # hard cap: drop anything farther than this
+                            # (175 reaches Tahoe / Gold Country / the Mendocino coast from Napa)
 MIN_RATING       = 4.0      # only "good reviews" — average stars >= this
 MIN_REVIEWS      = 4        # ...backed by at least this many ratings (signal, not noise)
 
@@ -36,11 +37,13 @@ WEEKENDS_ONLY = False       # True => only blocks that include a Fri or Sat nigh
 # the system has no review/star scores — so the beach section is ranked by distance + soonest.
 # Channel Islands (boat-in) are deliberately NOT here — the user doesn't want island camping.
 BEACH_ENABLED      = True
-BEACH_MAX_DISTANCE = 175     # miles from home; covers Pismo/El Capitán up the coast
+BEACH_MAX_DISTANCE = 175     # miles from home; covers the Sonoma + Mendocino coast from Napa
 # A ReserveCalifornia place is "beach camping" if its name ends in " SB" (State Beach) or
 # contains the word Beach, or is one of these coastal State Parks that have camping…
-BEACH_ALLOW = ("Leo Carrillo SP", "Point Mugu SP", "Crystal Cove SP Moro Campground",
-               "Gaviota SP", "Montana De Oro SP", "Morro Bay SP")
+# NorCal coast (Napa-anchored): Sonoma Coast SB + Half Moon Bay SB match by name; these
+# coastal State Parks with campgrounds are added explicitly.
+BEACH_ALLOW = ("Salt Point SP", "MacKerricher SP", "Van Damme SP", "Russian Gulch SP",
+               "Manchester SP", "Sue-meg SP", "Bodega Dunes", "Wrights Beach")
 # …but never these (inland, lakes, cottages/trailers, off-highway dune areas).
 BEACH_VETO  = ("Cottages", "Trailers", "Lake", "SRA", "SVRA", "SHP", "Reservoir", "Desert")
 
@@ -54,25 +57,24 @@ SHOW_ONLY_OPENINGS = True   # only show places with an actual 2-3 night block; h
 # Each campground is tagged with the NEAREST of these anchors (by lat/lng), so the page
 # can show a tab per place (Big Bear, Lake Arrowhead, …). Only regions that actually have
 # campgrounds in range appear as tabs. Add an anchor here to split/merge a region.
+# Northern California anchors, arranged around Napa (see HOME_* above). Add/merge an anchor to
+# split or combine a region; only anchors with campgrounds in range become tabs.
 REGION_ANCHORS = [
-    ("Big Bear",              34.244, -116.911),
-    ("Lake Arrowhead",        34.249, -117.189),
-    ("Idyllwild / San Jacinto", 33.745, -116.716),
-    ("Wrightwood / Big Pines", 34.360, -117.700),
-    ("San Gabriels / Angeles", 34.300, -118.020),
-    ("Ojai / Los Padres",     34.490, -119.250),
-    ("Mt Pinos / Frazier Park", 34.780, -119.000),
-    ("Pyramid Lake",          34.670, -118.790),
-    ("Malibu / Ventura Coast", 34.050, -118.950),
-    ("Orange County Coast",   33.460, -117.660),
-    ("Santa Barbara Coast",   34.460, -120.050),
-    ("San Diego Coast",       33.050, -117.290),
-    ("Central Coast / Pismo", 35.130, -120.630),
-    ("Big Sur",               36.270, -121.800),
-    # Desert (added 2026-07-01 from the sought-after study — Joshua Tree Jumbo Rocks/Indian Cove &
-    # Anza-Borrego are top bucket-list demand and in LA range, but had no anchor so were never searched).
-    ("Joshua Tree",           34.000, -116.160),
-    ("Anza-Borrego Desert",   33.270, -116.410),
+    ("Napa / Sonoma Valley",       38.400, -122.450),   # Bothe-Napa Valley, Sugarloaf Ridge
+    ("Lake Berryessa",             38.600, -122.230),
+    ("Point Reyes / Marin",        38.040, -122.800),
+    ("Sonoma Coast",               38.400, -123.070),    # Bodega Dunes, Wright's Beach, Jenner
+    ("Russian River / Guerneville", 38.500, -123.000),
+    ("Clear Lake",                 39.030, -122.760),
+    ("Anderson Valley / Hendy Woods", 39.075, -123.470),
+    ("Mendocino Coast",            39.310, -123.800),    # MacKerricher, Van Damme, Russian Gulch
+    ("Humboldt Redwoods",          40.310, -123.900),
+    ("Gold Country / Auburn",      38.900, -121.080),    # Sierra foothills, American River
+    ("Lake Tahoe (North)",         39.170, -120.140),
+    ("Lake Tahoe (South)",         38.940, -119.980),
+    ("Yosemite",                   37.865, -119.538),
+    ("Lassen Volcanic",            40.490, -121.500),
+    ("Big Basin / Santa Cruz Mtns", 37.170, -122.220),
 ]
 
 # Far destinations (e.g. Big Sur ~250mi) sit beyond the everyday LA radius and the

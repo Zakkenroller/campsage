@@ -37,13 +37,18 @@ WEEKENDS_ONLY = False       # True => only blocks that include a Fri or Sat nigh
 # the system has no review/star scores — so the beach section is ranked by distance + soonest.
 # Channel Islands (boat-in) are deliberately NOT here — the user doesn't want island camping.
 BEACH_ENABLED      = True
-BEACH_MAX_DISTANCE = 175     # miles from home; covers the Sonoma + Mendocino coast from Napa
+BEACH_MAX_DISTANCE = 600     # miles from home; statewide — the whole CA coast, Mendocino to San Diego
 # A ReserveCalifornia place is "beach camping" if its name ends in " SB" (State Beach) or
 # contains the word Beach, or is one of these coastal State Parks that have camping…
-# NorCal coast (Napa-anchored): Sonoma Coast SB + Half Moon Bay SB match by name; these
-# coastal State Parks with campgrounds are added explicitly.
-BEACH_ALLOW = ("Salt Point SP", "MacKerricher SP", "Van Damme SP", "Russian Gulch SP",
-               "Manchester SP", "Sue-meg SP", "Bodega Dunes", "Wrights Beach")
+# (Sonoma Coast SB, Half Moon Bay SB, Carpinteria SB, Refugio SB, El Capitán SB, … match by name;
+# these coastal State Parks up and down the state are added explicitly.)
+BEACH_ALLOW = (
+    # NorCal / Central coast
+    "Salt Point SP", "MacKerricher SP", "Van Damme SP", "Russian Gulch SP", "Manchester SP",
+    "Sue-meg SP", "Bodega Dunes", "Wrights Beach", "Montana De Oro SP", "Morro Bay SP",
+    # SoCal coast
+    "Leo Carrillo SP", "Point Mugu SP", "Crystal Cove SP Moro Campground", "Gaviota SP",
+    "San Onofre SB", "Doheny SB", "South Carlsbad SB", "Silver Strand SB")
 # …but never these (inland, lakes, cottages/trailers, off-highway dune areas).
 BEACH_VETO  = ("Cottages", "Trailers", "Lake", "SRA", "SVRA", "SHP", "Reservoir", "Desert")
 
@@ -55,37 +60,67 @@ SHOW_ONLY_OPENINGS = True   # only show places with an actual 2-3 night block; h
 
 # ── Destination regions (tabs) ────────────────────────────────────────────────
 # Each campground is tagged with the NEAREST of these anchors (by lat/lng), so the page
-# can show a tab per place (Big Bear, Lake Arrowhead, …). Only regions that actually have
-# campgrounds in range appear as tabs. Add an anchor here to split/merge a region.
-# Northern California anchors, arranged around Napa (see HOME_* above). Add/merge an anchor to
-# split or combine a region; only anchors with campgrounds in range become tabs.
+# can show a tab per place (Big Bear, Tahoe, …). Only regions that actually have campgrounds
+# in range appear as tabs. Add an anchor here to split/merge a region.
+#
+# STATEWIDE: these anchors blanket ALL of California so every major camping destination
+# surfaces under its tab. Home stays Napa (distance/directions are measured from there), so the
+# "All" tab still shows the closest spots first; the region tabs let you reach anywhere in CA.
 REGION_ANCHORS = [
-    ("Napa / Sonoma Valley",       38.400, -122.450),   # Bothe-Napa Valley, Sugarloaf Ridge
-    ("Lake Berryessa",             38.600, -122.230),
-    ("Point Reyes / Marin",        38.040, -122.800),
-    ("Sonoma Coast",               38.400, -123.070),    # Bodega Dunes, Wright's Beach, Jenner
+    # ── Bay Area / North Coast ──
+    ("Napa / Sonoma Valley",        38.400, -122.450),  # Bothe-Napa Valley, Sugarloaf Ridge
+    ("Lake Berryessa",              38.600, -122.230),
+    ("Point Reyes / Marin",         38.040, -122.800),
+    ("Sonoma Coast",                38.400, -123.070),   # Bodega Dunes, Wright's Beach, Jenner
     ("Russian River / Guerneville", 38.500, -123.000),
-    ("Clear Lake",                 39.030, -122.760),
+    ("Clear Lake",                  39.030, -122.760),
     ("Anderson Valley / Hendy Woods", 39.075, -123.470),
-    ("Mendocino Coast",            39.310, -123.800),    # MacKerricher, Van Damme, Russian Gulch
-    ("Humboldt Redwoods",          40.310, -123.900),
-    ("Gold Country / Auburn",      38.900, -121.080),    # Sierra foothills, American River
-    ("Lake Tahoe (North)",         39.170, -120.140),
-    ("Lake Tahoe (South)",         38.940, -119.980),
-    ("Yosemite",                   37.865, -119.538),
-    ("Lassen Volcanic",            40.490, -121.500),
+    ("Mendocino Coast",             39.310, -123.800),   # MacKerricher, Van Damme, Russian Gulch
+    ("Humboldt Redwoods / Redwoods", 40.310, -123.900),
+    # ── Far North ──
+    ("Shasta / Trinity",            41.000, -122.400),
+    ("Lassen Volcanic",             40.490, -121.500),
+    ("Lava Beds / Modoc",           41.710, -121.510),
+    # ── Sierra / Eastern ──
+    ("Gold Country / Auburn",       38.900, -121.080),   # Sierra foothills, American River
+    ("Plumas / Feather River",      39.940, -120.950),
+    ("Lake Tahoe (North)",          39.170, -120.140),
+    ("Lake Tahoe (South)",          38.940, -119.980),
+    ("Yosemite",                    37.865, -119.538),
+    ("Mammoth / Eastern Sierra",    37.650, -118.970),
+    ("Sequoia & Kings Canyon",      36.600, -118.700),
+    # ── Central Coast ──
     ("Big Basin / Santa Cruz Mtns", 37.170, -122.220),
+    ("Pinnacles",                   36.490, -121.180),
+    ("Monterey / Big Sur",          36.270, -121.800),
+    ("San Luis Obispo / Pismo",     35.130, -120.630),
+    ("Santa Barbara / Los Padres",  34.550, -119.800),
+    # ── Southern California ──
+    ("Ojai / Los Padres",           34.490, -119.250),
+    ("Malibu / Ventura Coast",      34.050, -118.950),
+    ("San Gabriels / Angeles",      34.300, -118.020),
+    ("Big Bear",                    34.244, -116.911),
+    ("Lake Arrowhead",              34.249, -117.189),
+    ("Idyllwild / San Jacinto",     33.745, -116.716),
+    ("Orange County Coast",         33.460, -117.660),
+    ("San Diego Coast",             33.050, -117.290),
+    ("Julian / Cuyamaca",           32.960, -116.600),
+    # ── Desert ──
+    ("Joshua Tree",                 34.000, -116.160),
+    ("Anza-Borrego Desert",         33.270, -116.410),
+    ("Death Valley",                36.500, -117.100),
+    ("Mojave National Preserve",    35.140, -115.510),
 ]
 
-# Far destinations (e.g. Big Sur ~250mi) sit beyond the everyday LA radius and the
-# recreation.gov search's 150-result score cap, so a single LA-centered search never
-# returns them. CampSage therefore ALSO runs a small search centered on each anchor and
-# merges the results. The "All" tab stays closest-to-LA (≤ MAX_DISTANCE_MI); farther
-# destination finds appear only under their own region tab.
+# Far destinations sit beyond the everyday home radius and the recreation.gov search's
+# ~150-result score cap, so a single home-centered search never returns them. CampSage
+# therefore ALSO runs a small search centered on each anchor and merges the results. The
+# "All" tab stays closest-to-home (≤ MAX_DISTANCE_MI); farther finds appear under their region tab.
 ANCHOR_SEARCH_ENABLED   = True
 REGION_SEARCH_RADIUS_MI = 60    # radius for each per-anchor destination search (covers the
                                 # full ~50mi span of a region, e.g. Plaskett Creek south of Big Sur)
-REGION_MAX_DISTANCE_MI  = 300   # absolute outer cap for any destination find (sanity)
+REGION_MAX_DISTANCE_MI  = 600   # absolute outer cap for any destination find — 600mi reaches
+                                # San Diego / Death Valley / Modoc from Napa, i.e. the whole state
 REGION_MAX_PER_TAB      = 12    # cap destination campgrounds kept per far region tab
 
 # ── State parks (ReserveCalifornia, beyond the beach section) ─────────────────
@@ -95,7 +130,8 @@ REGION_MAX_PER_TAB      = 12    # cap destination campgrounds kept per far regio
 # exist in ReserveCalifornia, so these rank by distance/soonest like the beaches do.
 STATE_PARKS_ENABLED    = True
 STATE_PARK_PER_ANCHOR  = 6      # nearest campable state parks kept per region (bounds API load)
-STATE_PARK_MAX_ANALYZE = 45     # global cap on parks we fetch availability for (API budget)
+STATE_PARK_MAX_ANALYZE = 70     # global cap on parks we fetch availability for (API budget;
+                                # raised for statewide coverage across many more anchors)
 
 # ── Plumbing ──────────────────────────────────────────────────────────────────
 DATA_DIR      = Path.home() / "campsage"

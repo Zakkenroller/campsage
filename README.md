@@ -4,10 +4,12 @@ Finds great **California** campsites with **2–3 consecutive nights open at the
 ranked **closest-to-home first** among **well-reviewed** spots, and publishes a phone-friendly
 status page + an interactive map. **No API keys.**
 
-Currently tuned for a **Napa, CA** home base (Northern California regions: Sonoma/Mendocino coast,
-Tahoe, Gold Country, Yosemite, the redwoods…). Change `HOME_*` + `REGION_ANCHORS` + `BEACH_ALLOW`
-in `config.py` to re-home it anywhere. It runs on a schedule via **GitHub Actions** and publishes a
-**static site to Netlify** — no server to keep alive (see **Deploy** below).
+Covers **all of California** — 37 region anchors blanket the state (North Coast & redwoods, Shasta,
+Tahoe & the Sierra, Yosemite, Sequoia, the Central Coast & Big Sur, Santa Barbara, the LA mountains,
+San Diego, and the desert parks). Home base is **Napa, CA**, so distance/directions and the "All" tab
+are measured from there while the region tabs let you reach anywhere in the state. Change `HOME_*` +
+`REGION_ANCHORS` + `BEACH_ALLOW` in `config.py` to re-home or re-scope it. It runs on a schedule via
+**GitHub Actions** and publishes a **static site to Netlify** — no server to keep alive (see **Deploy**).
 
 ## Quick start
 ```bash
